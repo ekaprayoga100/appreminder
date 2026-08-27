@@ -1,0 +1,40 @@
+# Dependencies
+vendor/
+node_modules/
+
+# Environment / Secrets
+.env
+*.env
+env
+
+# Database
+*.sql
+*.sqlite
+
+# Sensitive data files
+storage/.cron_secret
+
+# Logs
+logs/*.log
+
+# Backups
+backup/
+*.zip
+
+# Uploads (keep uploads/index.php, ignore everything else)
+uploads/*
+!uploads/index.php
+
+# Local dev / batch files
+run_cron.bat
+test_cron.php
+_test_*.php
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/

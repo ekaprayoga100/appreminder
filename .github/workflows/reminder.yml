@@ -1,0 +1,25 @@
+name: AppReminder Scheduler
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  trigger-cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger AppReminder cron
+        run: |
+          echo "Triggering cron trigger at $(date -u '+%Y-%m-%d %H:%M:%S') UTC"
+          RESPONSE=$(curl -fsS -w "\n%{http_code}" \
+            "${{ secrets.CRON_TRIGGER_URL }}" \
+            -H "Cache-Control: no-cache" \
+            -H "Accept: application/json")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          echo "HTTP Status: $HTTP_CODE"
+          echo "Response: $BODY"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::warning ::cron_trigger.php returned HTTP $HTTP_CODE"
+          fi

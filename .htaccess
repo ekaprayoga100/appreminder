@@ -1,0 +1,51 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Force HTTPS (skip for localhost)
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1|.*\.local)$ [NC]
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # Block access to sensitive directories
+    RewriteRule ^(storage|logs|backup)/ - [F,L,NC]
+
+    # Block access to sensitive files
+    <FilesMatch "\.(sql|zip|tar|gz|txt|md|env|gitignore|gitattributes)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+
+# Bypass anti-bot/anti-scraping for cron_trigger.php (used by cron-job.org)
+<Files "cron_trigger.php">
+    # Disable anti-bot challenge for this file
+    # (hosting-specific; may need to be disabled in hosting panel too)
+    <IfModule mod_headers.c>
+        Header always set Content-Type "application/json"
+        Header always set X-Content-Type-Options nosniff
+        Header always set Cache-Control "no-cache, no-store, must-revalidate"
+    </IfModule>
+</Files>
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options SAMEORIGIN
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Disable directory listing
+Options -Indexes
+
+# PHP settings for hosting
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+</IfModule>
+
+<IfModule mod_php8.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+</IfModule>
